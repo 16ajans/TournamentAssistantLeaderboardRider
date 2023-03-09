@@ -1,0 +1,5 @@
+node_modules/
+.env
+BotDatabase.db
+BotDatabase.db-shm
+BotDatabase.db-wal
