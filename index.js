@@ -12,7 +12,7 @@ const db = await open({
 })
 const EventId = process.env.EVENT_ID
 let channel
-let message
+const messages = []
 
 client.once(Events.ClientReady, async (c) => {
   console.log(`Ready! Logged in as ${c.user.tag}`)
@@ -25,11 +25,7 @@ client.once(Events.ClientReady, async (c) => {
 })
 
 function check () {
-  const embed = {
-    color: Math.floor(Math.random() * 16777215),
-    timestamp: new Date().toISOString(),
-    footer: { text: 'Retrieved:' }
-  }
+  let embeds = []
   Promise.all([
     db.get(`SELECT Name FROM Events WHERE Old=0 AND EventId='${EventId}';`),
     db.all(
@@ -43,8 +39,7 @@ function check () {
     const songs = results[1]
     const scores = results[2]
 
-    embed.title = eventName + ' Leaderboard'
-    embed.fields = songs.map((song) => {
+    const fields = songs.map((song) => {
       return {
         name: song.Name,
         value: scores
@@ -68,10 +63,25 @@ function check () {
           .join('\n')
       }
     })
-    if (message) {
-      message.edit({ embeds: [embed] })
+    embeds = embeds.concat(
+      fields.map((field) => {
+        return {
+          fields: [field],
+          color: Math.floor(Math.random() * 16777215),
+          timestamp: new Date().toISOString(),
+          footer: { text: 'Retrieved:' },
+          title: eventName + ' Leaderboards'
+        }
+      })
+    )
+    if (messages.length) {
+      for (let i = 0; i < embeds.length; i++) {
+        messages[i].edit({ embeds: [embeds[i]] })
+      }
     } else {
-      message = await channel.send({ embeds: [embed] })
+      for (let i = 0; i < embeds.length; i++) {
+        messages[i] = await channel.send({ embeds: [embeds[i]] })
+      }
     }
   })
 }
