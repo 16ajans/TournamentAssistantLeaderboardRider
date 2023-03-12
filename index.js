@@ -65,8 +65,18 @@ function check () {
     })
     embeds = embeds.concat(
       fields.map((field) => {
+        const fields = [{}]
+        Object.assign(fields[0], field)
+        if (field.value.length > 1024) {
+          const index = field.value.lastIndexOf('\n', 1023)
+          fields[0].value = fields[0].value.substring(0, index)
+          fields.push({})
+          Object.assign(fields[1], field)
+          fields[1].value = fields[1].value.substring(index + 1)
+          fields[1].name = fields[1].name + ' cont.'
+        }
         return {
-          fields: [field],
+          fields,
           color: Math.floor(Math.random() * 16777215),
           timestamp: new Date().toISOString(),
           footer: { text: 'Retrieved:' },
