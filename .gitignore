@@ -3,3 +3,4 @@ node_modules/
 BotDatabase.db
 BotDatabase.db-shm
 BotDatabase.db-wal
+export.xlsx
